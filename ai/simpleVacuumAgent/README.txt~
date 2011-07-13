@@ -1,0 +1,8 @@
+To run a Clojure REPL server(from the top level directory containing the pom.xml): 
+$>mvn clojure:swank
+
+To connect via Emacs:
+M-x slime-connect
+
+The pom.xml was got from here:
+    - http://dev.clojure.org/display/doc/Getting+Started+with+Maven

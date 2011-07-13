@@ -1,0 +1,15 @@
+(load "Sensors")
+(ns Agent
+  (:require Sensors))
+
+
+(defn use-sensors []
+  ""
+  (let [sensors (keys Sensors/*sensors*)]
+    (prn sensors)))
+
+(defn start []
+  (prn "Hi"))
+
+
+
