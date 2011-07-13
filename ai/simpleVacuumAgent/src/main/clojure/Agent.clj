@@ -1,4 +1,3 @@
-;(load "Sensors")
 (ns Agent
   (:require Sensors Actuators))
 
@@ -10,7 +9,7 @@
   )
 
 (defn move[]
-  (if (== 0 rand-int 2)
+  (if (== 0 (rand-int 2))
     (move-left)
     (move-right)))
 

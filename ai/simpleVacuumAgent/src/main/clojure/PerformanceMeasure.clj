@@ -1,6 +1,3 @@
-;(load "Environment")
-;(load "Agent")
-
 (ns PerformanceMeasure
   (:require Agent Environment))
 
