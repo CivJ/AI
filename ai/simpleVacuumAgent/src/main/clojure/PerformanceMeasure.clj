@@ -9,7 +9,9 @@
     (update-environment board agent-location)
     (Environment/count-clean-squares)))
 
-(defn run-agent-test [board agent-location stop-time]
+(defn run-agent-test
+  "Return a collection of test result data."
+  [board agent-location stop-time]
   (update-environment board agent-location)
     (loop [time 0
            score 0]
@@ -17,12 +19,19 @@
         (do
           (Agent/go)
           (recur (inc time)
-                 (+ score (measure-performance (Environment/get-board) (Environment/get-agent-location)))))
-        (prn "Starting location: " agent-location " Initial board: " board "    Score: " score))))
+                 (+ score
+                    (measure-performance (Environment/get-board) (Environment/get-agent-location)))))
+        (list board agent-location score))))
+
+(defn reduce-test-results
+  "Takes the results collection and returns the average score."
+  [results]
+  (quot (reduce + (map #(second (rest %1)) results))
+        (count results)))
 
 (defn run-all-tests []
   (let [boards (map first (Environment/build-all-possible-states))
        agent-locations (map second (Environment/build-all-possible-states))
-       times (repeat (count boards) 10)]
-    (map run-agent-test  boards agent-locations times )))
+       times (repeat (count boards) 10000)]
+    (prn "Average Score: " (double (reduce-test-results (map run-agent-test  boards agent-locations times ))))))
   
