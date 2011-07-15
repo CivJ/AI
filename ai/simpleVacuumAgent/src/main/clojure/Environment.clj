@@ -33,7 +33,6 @@ All possible environment states are in the sequence.We are Using vectors so we c
     {:agent-location agent-location
      :environment board}))
 
-
 (defn update-agent-location [location]
   "The agent may not move off the board."
   (let [min 0
@@ -48,7 +47,7 @@ All possible environment states are in the sequence.We are Using vectors so we c
 
 ;update our state with the new cleaned location
 (defn clean []
-  (let [location (*state* :agent-location)]
+  (let [location (get-agent-location)]
   (update-state (get-cleaned-environment location) location)))
 
 (defn is-location-dirty? [location]
