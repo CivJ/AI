@@ -25,5 +25,4 @@
        agent-locations (map second (Environment/build-all-possible-states))
        times (repeat (count boards) 2)]
     (map run-agent-test  boards agent-locations times )))
-    ;   (prn "boards: " boards " locations: " agent-locations " times: " times)))
   

@@ -2,11 +2,13 @@
   (:require Sensors Actuators))
 
 (defn move-left []
-  )
+  (Actuators/move-left))
+
 (defn move-right []
-  )
+  (Actuators/move-right))
+
 (defn clean[]
-  )
+  (Actuators/clean))
 
 (defn move[]
   (if (== 0 (rand-int 2))

@@ -1,4 +1,3 @@
-;(load "Environment")
 (ns Sensors
   (:require Environment))
 
