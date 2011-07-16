@@ -1,26 +1,25 @@
 (ns PerformanceMeasure
   (:require Agent Environment))
 
-(defn update-environment [board agent-location]
-  (Environment/update-state board agent-location))
+(defn measure-performance []
+    (Environment/count-clean-squares))
 
-(defn measure-performance [board agent-location]
-  (do
-    (update-environment board agent-location)
-    (Environment/count-clean-squares)))
+(defn initialize-environment
+  "Define the initial board state and agent location"
+  [board agent-location]
+  (Environment/update-state board agent-location))
 
 (defn run-agent-test
   "Return a collection of test result data."
   [board agent-location stop-time]
-  (update-environment board agent-location)
+  (initialize-environment board agent-location)
     (loop [time 0
            score 0]
       (if (< time stop-time)
         (do
           (Agent/go)
           (recur (inc time)
-                 (+ score
-                    (measure-performance (Environment/get-board) (Environment/get-agent-location)))))
+                 (+ score (measure-performance))))
         (list board agent-location score))))
 
 (defn reduce-test-results
@@ -32,6 +31,6 @@
 (defn run-all-tests []
   (let [boards (map first (Environment/build-all-possible-states))
        agent-locations (map second (Environment/build-all-possible-states))
-       times (repeat (count boards) 10000)]
+       times (repeat (count boards) 1000)]
     (prn "Average Score: " (double (reduce-test-results (map run-agent-test  boards agent-locations times ))))))
   
