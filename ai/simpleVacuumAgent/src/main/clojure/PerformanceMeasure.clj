@@ -1,8 +1,15 @@
 (ns PerformanceMeasure
   (:require Agent Environment))
 
+(defn get-score []
+  (Environment/count-clean-squares))
+
+(defn get-penalties []
+  "The agent loses 1 point for each movement or movement attempt."
+  (if (Agent/moved?) -1 0))
+
 (defn measure-performance []
-    (Environment/count-clean-squares))
+  (+ (get-score) (get-penalties)))
 
 (defn initialize-environment
   "Define the initial board state and agent location"

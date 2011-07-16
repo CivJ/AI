@@ -19,7 +19,13 @@
   (Sensors/is-current-location-dirty?))
 
 (defn go []
+  "Performs the agent's sensing and actions."
   (if (is-current-location-dirty?)
-    (clean)
-    (move)))
+    (do
+      (clean)
+      (defn moved? [] false))
+    (do
+      (move)
+      (defn moved? [] true))))
+  
     
