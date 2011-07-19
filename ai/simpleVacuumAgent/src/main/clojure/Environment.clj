@@ -4,7 +4,7 @@
 ;TODO change this to a function
 (defn get-board-size []
   "Gets the size of the board."
-  3)
+  10)
 
 ;The "board" will be a seq of 0's and 1's representing clean and dirty.
 (def *state*
