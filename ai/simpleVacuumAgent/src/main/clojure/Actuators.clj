@@ -1,8 +1,8 @@
 (ns Actuators
   (:require Environment))
 
-(defn move [f]
-  (Environment/update-agent-location (f 1 (Environment/get-agent-location))))
+(defn move [plus-or-minus]
+  (Environment/update-agent-location (plus-or-minus (Environment/get-agent-location) 1)))
 
 (defn move-left []
   (move -))

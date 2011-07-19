@@ -1,7 +1,6 @@
 (ns Environment
   (:require clojure.contrib.combinatorics))
 
-;TODO change this to a function
 (defn get-board-size []
   "Gets the size of the board."
   3)
@@ -39,7 +38,8 @@ All possible environment states are in the sequence.We are Using vectors so we c
         max (- (count (get-board)) 1)]
   (cond
    (< location min) (update-state (get-board) min)
-   (> location max) (update-state (get-board) max ))))
+   (> location max) (update-state (get-board) max)
+   true (update-state (get-board) location))))
     
 ;assoc only works on maps and vectors.
 (defn get-cleaned-environment [location]
@@ -55,7 +55,7 @@ All possible environment states are in the sequence.We are Using vectors so we c
     true
     false))
 
-(defn count-clean-squares[]
+(defn count-clean-squares []
   "Returns the number of clean squares in the environment."
   (reduce + (get-board)))
 

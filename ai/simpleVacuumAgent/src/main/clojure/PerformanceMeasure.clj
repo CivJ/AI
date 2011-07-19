@@ -4,9 +4,12 @@
 (defn get-score []
   (Environment/count-clean-squares))
 
+(defn agent-moved? []
+  (= Agent/last-action? Agent/actions-move))
+
 (defn get-penalties []
   "The agent loses 1 point for each movement or movement attempt."
-  (if (Agent/moved?) -1 0))
+  (if (agent-moved?) -1 0))
 
 (defn measure-performance []
   (+ (get-score) (get-penalties)))
@@ -36,8 +39,13 @@
         (count results)))
 
 (defn run-all-tests []
-  (let [boards (map first (Environment/build-all-possible-states))
+  (let [time 1000
+        boards (map first (Environment/build-all-possible-states))
        agent-locations (map second (Environment/build-all-possible-states))
-       times (repeat (count boards) 1000)]
-    (prn "Average Score: " (double (reduce-test-results (map run-agent-test  boards agent-locations times ))))))
+       times (repeat (count boards) time)]
+    (prn "Average Score for " time "loops : "
+         (double (reduce-test-results (map run-agent-test  boards agent-locations times ))))))
+
+
+
   

@@ -7,25 +7,45 @@
 (defn move-right []
   (Actuators/move-right))
 
+(def actions-clean "clean")
+(def actions-move "move")
+
+(def last-action?
+  nil)
+
 (defn clean[]
   (Actuators/clean))
 
-(defn move[]
-  (if (== 0 (rand-int 2))
+(defn last-move-successful? []
+  (not (= (Sensors/previous-location?) (Sensors/current-location?))))
+
+(defn keep-going []
+  (if (= (Sensors/previous-direction?) Sensors/left)
     (move-left)
     (move-right)))
+
+(defn turn-around []
+  (if (= (Sensors/previous-direction?) Sensors/left)
+    (move-right)
+    (move-left)))
+  
+(defn move[]
+  (if (last-move-successful?)
+    (keep-going)
+    (turn-around)))
 
 (defn is-current-location-dirty? []
   (Sensors/is-current-location-dirty?))
 
 (defn go []
-  "Performs the agent's sensing and actions."
+  (do
+    (Sensors/sense-environment)
   (if (is-current-location-dirty?)
     (do
       (clean)
-      (defn moved? [] false))
+      (def last-action? actions-clean))
     (do
       (move)
-      (defn moved? [] true))))
-  
-    
+      (def last-action? actions-move)))))
+
+
