@@ -28,6 +28,9 @@
       (if (< time stop-time)
         (do
           (Agent/go)
+          (prn "Board: " (Environment/*state* :environment))
+          (prn "Location: " (Environment/*state* :agent-location))
+          (prn "Score: " score)
           (recur (inc time)
                  (+ score (measure-performance))))
         (list board agent-location score))))
@@ -39,7 +42,7 @@
         (count results)))
 
 (defn run-all-tests []
-  (let [time 1000
+  (let [time 5
         boards (map first (Environment/build-all-possible-states))
        agent-locations (map second (Environment/build-all-possible-states))
        times (repeat (count boards) time)]

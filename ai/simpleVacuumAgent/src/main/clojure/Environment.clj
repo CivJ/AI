@@ -36,10 +36,10 @@ All possible environment states are in the sequence.We are Using vectors so we c
   "The agent may not move off the board."
   (let [min 0
         max (- (count (get-board)) 1)]
-  (cond
-   (< location min) (update-state (get-board) min)
-   (> location max) (update-state (get-board) max)
-   true (update-state (get-board) location))))
+    (cond
+     (< location min) (update-state (get-board) min)
+     (> location max) (update-state (get-board) max)
+     true (update-state (get-board) location))))
     
 ;assoc only works on maps and vectors.
 (defn get-cleaned-environment [location]

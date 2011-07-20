@@ -9,9 +9,9 @@
 
 (def actions-clean "clean")
 (def actions-move "move")
-
-(def last-action?
-  nil)
+(def actions-noop "noop")
+(def last-action? nil)
+(def turn-around-count 0)
 
 (defn clean[]
   (Actuators/clean))
@@ -25,14 +25,19 @@
     (move-right)))
 
 (defn turn-around []
-  (if (= (Sensors/previous-direction?) Sensors/left)
-    (move-right)
-    (move-left)))
+  (do
+    (if (= (Sensors/previous-direction?) Sensors/left)
+      (move-right)
+      (move-left))
+    (def turn-around-count (inc turn-around-count))))
   
 (defn move[]
   (if (last-move-successful?)
     (keep-going)
     (turn-around)))
+
+(defn done-with-patrol? []
+  (> turn-around-count 1))
 
 (defn is-current-location-dirty? []
   (Sensors/is-current-location-dirty?))
@@ -45,7 +50,10 @@
       (clean)
       (def last-action? actions-clean))
     (do
-      (move)
-      (def last-action? actions-move)))))
+      (if (not (done-with-patrol?))
+        (do
+          (move)
+          (def last-action? actions-move))
+        (def last-action? actions-noop))))))
 
 
