@@ -1,59 +1,38 @@
 (ns Agent
-  (:require Sensors Actuators))
+  (:require Environment))
 
-(defn move-left []
-  (Actuators/move-left))
+(defn done?[environment]
+  (and (Environment/visited-left-room? environment)
+       (Environment/visited-right-room? environment)))
 
-(defn move-right []
-  (Actuators/move-right))
+(defn traveling? 
+  "Compare current location to last location with f. f is <,>,=
+Returns (f current previous)"
+  [environment f]
+  (f (Environment/location? environment) (Environment/previous-location? environment)))
 
-(def actions-clean "clean")
-(def actions-move "move")
-(def actions-noop "noop")
-(def last-action? nil)
-(def turn-around-count 0)
+(defn not-traveling?
+  [environment]
+  (traveling? environment =))
 
-(defn clean[]
-  (Actuators/clean))
+(defn traveling-backward?
+  [environment]
+  (traveling? environment <))
 
-(defn last-move-successful? []
-  (not (= (Sensors/previous-location?) (Sensors/current-location?))))
+(defn first-move?
+  [environment]
+  (nil? (Environment/previous-location? environment)))
 
-(defn keep-going []
-  (if (= (Sensors/previous-direction?) Sensors/left)
-    (move-left)
-    (move-right)))
+(defn direction
+  "If we are not moving, check which direction we should go.
+If we are moving, keep going untill we 'hit a wall'."
+  [environment]
+  (cond (first-move? environment) Environment/backward
+        (traveling-backward? environment) Environment/backward
+        :else Environment/forward))
 
-(defn turn-around []
-  (do
-    (if (= (Sensors/previous-direction?) Sensors/left)
-      (move-right)
-      (move-left))
-    (def turn-around-count (inc turn-around-count))))
-  
-(defn move[]
-  (if (last-move-successful?)
-    (keep-going)
-    (turn-around)))
-
-(defn done-with-patrol? []
-  (> turn-around-count 1))
-
-(defn is-current-location-dirty? []
-  (Sensors/is-current-location-dirty?))
-
-(defn go []
-  (do
-    (Sensors/sense-environment)
-  (if (is-current-location-dirty?)
-    (do
-      (clean)
-      (def last-action? actions-clean))
-    (do
-      (if (not (done-with-patrol?))
-        (do
-          (move)
-          (def last-action? actions-move))
-        (def last-action? actions-noop))))))
-
-
+(defn go
+  [environment]
+  (cond (done? environment) environment
+        (Environment/dirty? environment) (Environment/clean environment)
+        :else (Environment/move environment (direction environment))))

@@ -1,39 +1,45 @@
 (ns PerformanceMeasure
   (:require Agent Environment))
 
-(defn get-score []
-  (Environment/count-clean-squares))
+(defn get-points
+  [environment]
+  (Environment/count-clean-rooms environment))
 
-(defn agent-moved? []
-  (= Agent/last-action? Agent/actions-move))
+(defn agent-moved?
+  [environment]
+  (if (Agent/first-move? environment) false
+      (not (=
+            (Environment/location? environment)
+            (Environment/previous-location? environment)))))
 
-(defn get-penalties []
+(defn get-penalties
+  [environment]
   "The agent loses 1 point for each movement or movement attempt."
-  (if (agent-moved?) -1 0))
+  (if (agent-moved? environment) -1 0))
 
-(defn measure-performance []
-  (+ (get-score) (get-penalties)))
+(defn get-score
+  [environment]
+    (+ (get-points environment) (get-penalties environment)))
 
-(defn initialize-environment
-  "Define the initial board state and agent location"
-  [board agent-location]
-  (Environment/update-state board agent-location))
+(defn measure-performance
+  [test]
+  (let [environment (Agent/go(test :environment))
+        score (get-score environment)]
+    (-> test
+        (assoc :environment environment)
+        (assoc :score score))))
 
-(defn run-agent-test
-  "Return a collection of test result data."
-  [board agent-location stop-time]
-  (initialize-environment board agent-location)
-    (loop [time 0
-           score 0]
-      (if (< time stop-time)
-        (do
-          (Agent/go)
-          (prn "Board: " (Environment/*state* :environment))
-          (prn "Location: " (Environment/*state* :agent-location))
-          (prn "Score: " score)
-          (recur (inc time)
-                 (+ score (measure-performance))))
-        (list board agent-location score))))
+(defn run-test
+  [time test]
+  (if (< time (test :stop-time))
+    (run-test (inc time) (measure-performance test))
+    test))
+
+(defn begin-test
+  "Entry point for the test. Returns the given test with an updated score and environment."
+  [test]
+  (let [stop-time 0]
+    (run-test stop-time test)))
 
 (defn reduce-test-results
   "Takes the results collection and returns the average score."
@@ -41,14 +47,41 @@
   (quot (reduce + (map #(second (rest %1)) results))
         (count results)))
 
-(defn run-all-tests []
-  (let [time 5
-        boards (map first (Environment/build-all-possible-states))
-       agent-locations (map second (Environment/build-all-possible-states))
-       times (repeat (count boards) time)]
-    (prn "Average Score for " time "loops : "
-         (double (reduce-test-results (map run-agent-test  boards agent-locations times ))))))
+(defn initialize-environment
+  "Define the initial board state and agent location"
+  [board agent-location]
+  (-> (Environment/make)
+      (Environment/add-board board)
+      (Environment/add-agent-location agent-location)))
 
+(defn build-all-environments []
+  "Builds all possible environments based on the board size. This will take a long even for
+smallish boards."
+  (let [environment-states (Environment/build-all-possible-states)
+        boards (map first environment-states)
+        agent-locations (map second environment-states)]
+    (map initialize-environment boards agent-locations)))
 
+(defn build-test
+  [environment stop-time]
+  {:environment environment
+   :stop-time stop-time})
 
-  
+(defn build-all-tests
+  [stop-time]
+  (let [environments (build-all-environments)
+        times (repeat (count environments) stop-time)]
+    (map build-test environments times)))
+
+(defn get-scores
+  [tests]
+  (map get tests (repeat (count tests) :score)))
+
+(defn reduce-scores
+  [scores]
+  (double (/ (reduce + scores) (count scores))))
+
+(defn run-all-tests
+  [stop-time]
+  (prn "Average Score: " (reduce-scores (get-scores (map begin-test (build-all-tests stop-time))))))
+
