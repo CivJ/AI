@@ -1,31 +1,38 @@
 (ns Agent
-  (:require Sensors Actuators))
+  (:require Environment))
 
-(defn move-left []
-  (Actuators/move-left))
+(defn done?[environment]
+  (and (Environment/visited-left-room? environment)
+       (Environment/visited-right-room? environment)))
 
-(defn move-right []
-  (Actuators/move-right))
+(defn traveling? 
+  "Compare current location to last location with f. f is <,>,=
+Returns (f current previous)"
+  [environment f]
+  (f (Environment/location? environment) (Environment/previous-location? environment)))
 
-(defn clean[]
-  (Actuators/clean))
+(defn not-traveling?
+  [environment]
+  (traveling? environment =))
 
-(defn move[]
-  (if (== 0 (rand-int 2))
-    (move-left)
-    (move-right)))
+(defn traveling-backward?
+  [environment]
+  (traveling? environment <))
 
-(defn is-current-location-dirty? []
-  (Sensors/is-current-location-dirty?))
+(defn first-move?
+  [environment]
+  (nil? (Environment/previous-location? environment)))
 
-(defn go []
-  "Performs the agent's sensing and actions."
-  (if (is-current-location-dirty?)
-    (do
-      (clean)
-      (defn moved? [] false))
-    (do
-      (move)
-      (defn moved? [] true))))
-  
-    
+(defn direction
+  "If we are not moving, check which direction we should go.
+If we are moving, keep going untill we 'hit a wall'."
+  [environment]
+  (cond (first-move? environment) Environment/backward
+        (traveling-backward? environment) Environment/backward
+        :else Environment/forward))
+
+(defn go
+  [environment]
+  (cond (done? environment) environment
+        (Environment/dirty? environment) (Environment/clean environment)
+        :else (Environment/move environment (direction environment))))
