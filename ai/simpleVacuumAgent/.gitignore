@@ -1,3 +1,0 @@
-#ignore build directory and emacs backup files
-target/
-*~
