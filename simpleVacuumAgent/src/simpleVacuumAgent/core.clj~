@@ -1,6 +1,0 @@
-(ns simpleVacuumAgent.core
-  :use PerformanceMeasure)
-
-(defn -main [& args]
-  (PerformanceMeasure/run-all-tests 10))
-
