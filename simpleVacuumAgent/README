@@ -1,0 +1,7 @@
+# simpleVaccumAgent
+
+Using Lein to manage project structure and dependencies.
+
+## Usage
+
+$lein run #Runs core.clj 
